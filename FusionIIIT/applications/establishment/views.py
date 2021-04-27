@@ -14,7 +14,6 @@ from .models import *
 from .forms import *
 import numpy as np
 from dateutil.relativedelta import relativedelta
-
 def initial_checks(request):
     return {}
 
