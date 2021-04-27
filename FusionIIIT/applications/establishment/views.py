@@ -139,6 +139,7 @@ def handle_cpda_admin(request):
             application.tracking_info.remarks_rev2="Not reviewed yet"
             application.tracking_info.remarks_rev3="Not reviewed yet"
             application.tracking_info.review_status = 'under_review'
+            application.status=status
             application.tracking_info.save()
 
             # notify
@@ -153,7 +154,11 @@ def handle_cpda_admin(request):
     elif app_id:
         # update the status of app
         application = Cpda_application.objects.select_related('applicant').get(id=app_id)
-        application.status = status
+        if(application.status=='adjustments_pending' and application.tracking_info.review_status=='reviewed' and status=='approved'):
+            application.status= 'finished'
+        else:
+            application.status = status
+        
         application.save()
 
         # notify
@@ -326,8 +331,8 @@ def generate_cpda_admin_lists(request):
 
         # if status is adjustments_pending:to_assign/reviewed
         else:
-            temp = Assign_Form(initial={'status': 'adjustments_pending', 'app_id': app.id})
-            temp.fields["status"]._choices = [
+            temp = Assign_Form(initial={'assign_status': 'adjustments_pending', 'app_id': app.id})
+            temp.fields["assign_status"]._choices = [
                 ('adjustments_pending', 'Adjustments Pending'),
                 ('finished', 'Finished')
             ]
